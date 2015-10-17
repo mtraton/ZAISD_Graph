@@ -16,9 +16,9 @@ public interface Graph {
     public void addVertex(int vertexID); // domyœlny argument?
     public void removeVertex(int vertexID);
     public void addEdge(int v1ID, int v2ID, int weight);
-    public void removeEdge(int v1, int v2, int weight);
-    public int[] returnNeighbourVertices(int vertexID);
-    public int[] returnIncidentEdges(int vertexID);
+    public void removeEdge(int v1, int v2);
+    public Vertex[] returnNeighbourVertices(int vertexID);
+    public Edge[] returnIncidentEdges(int vertexID);
     public int getNumberOfVertices();
     public int getNumberOfEdges();
     public boolean areNeighbours(int v1, int v2);

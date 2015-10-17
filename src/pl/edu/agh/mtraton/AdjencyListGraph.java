@@ -4,23 +4,25 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import pl.edu.agh.mtraton.Utils.GraphUtils;
 
 /**
  * Created by Rael on 2015-10-08.
  */
-//=
-// TODO type float  - zamieniæ int - wagi s¹ zmiennoprzecinkowe
+//
+// TODO change data type to float?
 // TODO prealokacja i potem póŸniejsze rozszerzanie
 
 public class AdjencyListGraph implements  Graph {
     // POLA
 
-    int [][] graph; //  list of outcoming edges from gives vertex
+    Vertex<Integer> [][] graph; //  list of outcoming edges from gives vertex
     int indicesCount = 0;
+
     public AdjencyListGraph (String path)
     {
         indicesCount = loadNumberOfIndices(path);
-        graph = new int[indicesCount][0];
+        graph = new Vertex [indicesCount +1][0] ; // assumption - we can have indice with id that equals 0
         loadGraphFromFile(path);
     }
 
@@ -35,7 +37,7 @@ public class AdjencyListGraph implements  Graph {
 
     public int loadNumberOfIndices(String Path)
     {
-        // TODO :
+        // TODO : m¹drzejsze wczytywanie grafu
         BufferedReader br = null;
         String line =  "";
         String separator = ";";
@@ -75,14 +77,22 @@ public class AdjencyListGraph implements  Graph {
 
 
     // METODY
-
+    /*
     public int [] expandArray (int [] array, int newSize, int oldSize)
     {
         int [] expandedArray = new int [newSize];
         System.arraycopy(array, 0, expandedArray, 0, oldSize);
         return expandedArray;
     }
+    */
 
+
+    public Vertex [] expandArray (Vertex [] oldArray, int newSize, int oldSize)
+    {
+        Vertex [] expandedArray = new Vertex [newSize];
+        System.arraycopy(oldArray, 0, expandedArray, 0, oldSize);
+        return expandedArray;
+    }
     public void loadGraphFromFile(String Path)
     {
         BufferedReader br = null;
@@ -99,12 +109,15 @@ public class AdjencyListGraph implements  Graph {
                 for (int i = 0; i <  values.length; i++) {
                     trimmedArray[i] = values[i].trim(); // removing whitespace from string
                 }
-                int v1 = Integer.parseInt(trimmedArray[0]) -1; // array index starts with 0, graph index starts with 1!
-                int v2 = Integer.parseInt(trimmedArray[1]) -1;
+                int v1 = Integer.parseInt(trimmedArray[0]); // array index starts with 0, graph index starts with 1!
+                int v2 = Integer.parseInt(trimmedArray[1]) ; // TODO: check out if works ok
                 int weight = Integer.parseInt(trimmedArray[2]);
-                // ehxpand array
+                //printArray(graph[v1]);
+                // expand array
                 {
-                    graph[v1] = expandArray(graph[v1], graph[v1].length, graph[v1].length + 1);
+                    graph[v1] = expandArray(graph[v1], graph[v1].length + 1, graph[v1].length);
+                   //    printArray(graph[v1]);
+                    graph[v1][graph[v1].length-1] = new Vertex (v2, weight);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -122,39 +135,277 @@ public class AdjencyListGraph implements  Graph {
         }
         System.out.println("Loading complete!");
     }
-    public void addVertex(int vertexID)
+
+    // TODO:  vertex id is not the same as it's place in array - how to deal with this?
+    // Treat Matrix as a list?
+    public void addVertex(int vertexID) // TODO : parametrize val?
     {
+        for(int i = 0; i < graph.length; i++)
+        {
+            if(i == (vertexID-1)) {
+                System.out.println("Vertex with given id exists!");
+                return;
+            }
+
+        }
+        graph = expandMatrix(graph, vertexID);
 
     }
-    public void removeVertex(int vertexID)
-    {
 
+    private Vertex[][] expandMatrix(Vertex[][] previous, int newSize) {
+
+        int prevRowCount = previous.length;
+
+        Vertex[][] withExtraRow = new Vertex[newSize][];
+        System.arraycopy(previous, 0, withExtraRow, 0, previous.length);
+        withExtraRow[prevRowCount] = new Vertex[1];
+
+        return withExtraRow;
     }
+
+    public void removeVertex(int vertexID) // todo: will this destroy the order in graph -> indices will not corespond with nodes?
+    {
+        // check if exists
+        if(vertexID >= 0 && vertexID < graph.length)
+        {
+            Vertex[][] contractedArr = new Vertex[graph.length-1][];
+            for(int i = 0, j = 0; (i < graph.length) && (j < contractedArr.length); i++, j++)
+            {
+                if(i == vertexID)
+                {
+                    j--; // skip removed vertex
+                    continue;
+                }
+                contractedArr[j] = graph[i];
+            }
+            graph = contractedArr;
+        }
+        else{
+            System.out.println("Given vertex does not exist");
+        }
+    }
+
+    public void clearVertex(int vertexID){
+        if(vertexID >= 0 && vertexID <= graph.length)
+        {
+            graph[vertexID] = new Vertex[0];
+        }
+        else{
+            System.out.println("Given vertex does not exist");
+        }
+    }
+
     public void addEdge(int v1ID, int v2ID, int weight)
     {
+        System.out.print("!!!" + graph[v1ID].length);
+
+        for(int i = 1; i < graph[v1ID].length; i++) // TODO : deal with empty [0] elements
+        {
+            Vertex tmp = graph[v1ID][i];
+            System.out.println(tmp);
+            if(tmp.getVid() == v2ID) //  check out if given edge already exists
+            {
+                return;
+            }
+        }
+        graph[v1ID] = expandArray(graph[v1ID], graph[v1ID].length + 1, graph[v1ID].length);
+        graph[v1ID][graph[v1ID].length-1] = new Vertex(v2ID, weight);
+    }
+
+    public void removeEdge(int v1ID, int v2ID)
+    {
+        // check out if given edge exists
+        for(int i = 0; i < graph[v1ID].length; i++)
+        {
+            if(graph[v1ID][i].getVid() == v2ID)
+            {
+                // delete vertex with v2ID
+                graph[v1ID] = removeElementFromArray(graph[v1ID], v2ID);
+                return;
+            }
+
+        }
+        System.out.println("Given edge does not exist!"); // TODO: throw exception?
+    }
+
+    public Vertex[] removeElementFromArray(Vertex[] arr, int id)
+    {
+        Vertex [] newArr = new Vertex[arr.length-1];
+        printArray(arr);
+
+        for(int i=0, j =0; (i < arr.length) && (j < newArr.length); i++, j++)
+        {
+            if(arr[i].getVid() == id)
+            {
+                j--;
+                continue; // skip removed element
+            }
+            newArr[j] = arr[i];
+        }
+        return newArr;
+    }
+
+    public Vertex[] returnNeighbourVertices(int vertexID)
+    {
+        Vertex [] Neighbours = graph[vertexID];
+        for(int i = 0; i < graph.length; i++)
+        {
+            // find neighbours whose edges are coming to vertex
+            if(i == vertexID) continue;
+            for(int j = 0; j < graph[i].length; j++)
+            {
+                if(graph[i][j].getVid() == vertexID)
+                {
+                    // expand and add new neighbour
+                    // TODO: deal with duplicates
+                    Neighbours = expandArray(Neighbours, Neighbours.length+1,Neighbours.length);
+                    Neighbours[Neighbours.length-1] = new Vertex(i,-graph[i][j].getValue());
+                }
+            }
+        }
+        printArray(Neighbours);
+        Neighbours = removeDuplicates(Neighbours);
+        printArray(Neighbours);
+        return Neighbours; //TODO:
+    }
+
+    public Vertex[] removeDuplicates(Vertex[] arr) {
+
+        int end = arr.length;
+
+        for (int i = 0; i < end; i++) {
+            for (int j = i + 1; j < end; j++) {
+                if (arr[i].getVid() == arr[j].getVid()) {
+                    int shiftLeft = j;
+                    for (int k = j+1; k < end; k++, shiftLeft++) {
+                        arr[shiftLeft] = arr[k];
+                    }
+                    end--;
+                    j--;
+                }
+            }
+        }
+
+        Vertex[] whitelist = new Vertex[end];
+        for(int i = 0; i < end; i++){
+            whitelist[i] = arr[i];
+        }
+        return whitelist;
+    }
+
+
+    public Edge[] returnIncidentEdges(int vertexID)
+    {
+        // outcoming edges
+        Edge [] incident = new Edge[0];
+        for(int i = 0; i < graph[vertexID].length; i++)
+        {
+            incident =  GraphUtils.expandArray(incident, incident.length+1, incident.length);
+            Edge tmp = new Edge(vertexID, graph[vertexID][i], graph[vertexID][i].getValue());
+            incident[incident.length-1] = tmp;
+        }
+        //incoming edges
+        for(int i = 0; i < graph.length; i++)
+        {
+            for(int j = 0; j < graph[i].length; j++)
+            {
+                if(i == vertexID) continue;
+                if(graph[i][j].getVid() == vertexID)
+                {
+                    incident =  GraphUtils.expandArray(incident, incident.length+1, incident.length);
+                    Edge tmp = new Edge(j+1, graph[i][j], graph[i][j].getValue()); // todo: error?
+                    incident[incident.length-1] = tmp;
+                }
+            }
+        }
+        return incident;
+
+        //todo: merge with subfunctions
 
     }
-    public void removeEdge(int v1ID, int v2ID, int weight)
-    {
+
+    public Edge[] returnInComingEdges(int vertexID) {
+        // Incoming edges
+        Edge[] incident = new Edge[0];
+        for(int i = 0; i < graph.length; i++)
+        {
+            for(int j = 0; j < graph[i].length; j++)
+            {
+                if(i == vertexID) continue;
+                if(graph[i][j].getVid() == vertexID)
+                {
+                   // System.out.print("i = " + i);
+                    printArray(graph[i]);
+                    incident =  GraphUtils.expandArray(incident, incident.length+1, incident.length);
+                    Edge tmp = new Edge(i, graph[i][j], graph[i][j].getValue());
+                    incident[incident.length-1] = tmp;
+                }
+            }
+        }
+        return incident;
 
     }
-    public int[] returnNeighbourVertices(int vertexID)
-    {
-        return null;
+
+    public Edge[] returnOutComingEdges(int vertexID) {
+        // outcoming edges
+        Edge[] incident = new Edge[0];
+        for (int i = 0; i < graph[vertexID].length; i++) {
+            incident = GraphUtils.expandArray(incident, incident.length + 1, incident.length);
+            Edge tmp = new Edge(vertexID, graph[vertexID][i], graph[vertexID][i].getValue());
+            incident[incident.length - 1] = tmp;
+        }
+        return incident;
     }
-    public int[] returnIncidentEdges(int vertexID)
-    {
-        return null;
-    }
+
     public int getNumberOfVertices(){
-        return 0;
+        return graph.length - 1; // element with 0 index is empty!
     }
     public int getNumberOfEdges()
     {
-        return 0;
+        int edges = 0;
+        for(int i = 0; i < graph.length; i++)
+        {
+                edges += graph[i].length;
+        }
+        return edges;
     }
     public boolean areNeighbours(int v1, int v2)
     {
+        for(int i = 0; i < graph[v1].length; i++)
+        {
+            if(graph[v1][i].getVid() == v2) return true;
+        }
+        for(int i = 0; i < graph[v2].length; i++)
+        {
+            if(graph[v2][i].getVid() == v2) return true;
+        }
         return false;
+    }
+    public void printArray (Vertex[] arr)
+    {
+        System.out.println("Array length: " + arr.length);
+        for(int i = 0; i < arr.length; i++)
+        {
+            System.out.println("Array[" + i + "]: " + arr[i]);
+        }
+    }
+    public void printArray (Edge[] arr)
+    {
+        System.out.println("Array length: " + arr.length);
+        for(int i = 0; i < arr.length; i++)
+        {
+            System.out.println("Array[" + i + "]: " + arr[i]);
+        }
+    }
+    public void printGraph() // TODO: what to do with 0 element?
+    {
+        for (int i = 0; i < graph.length; i++)
+        {
+            System.out.println("Vertex " + (i) + " neighbours:");
+            for(int j = 0; j < graph[i].length; j++)
+            {
+                System.out.println(graph[i][j]);
+            }
+        }
     }
 }
