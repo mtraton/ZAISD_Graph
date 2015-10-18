@@ -16,7 +16,7 @@ public class MatrixGraph implements Graph {
     int graphSize;
     public MatrixGraph(String Path)
     {
-        graphSize = loadNumberOfIndices(Path);
+        graphSize = loadNumberOfIndices(Path) + 1;// todo: achieve array index = graph index
         setGraph(new int[graphSize][graphSize]);
         loadGraphFromFile(Path);
     }
@@ -75,8 +75,8 @@ public class MatrixGraph implements Graph {
                 for (int i = 0; i <  values.length; i++) {
                     trimmedArray[i] = values[i].trim(); // removing whitespace from string
                 }
-                int v1 = Integer.parseInt(trimmedArray[0]) -1; // array index starts with 0, graph index starts with 1!
-                int v2 = Integer.parseInt(trimmedArray[1]) -1;
+                int v1 = Integer.parseInt(trimmedArray[0]) ; // array index starts with 0, graph index starts with 1!
+                int v2 = Integer.parseInt(trimmedArray[1]) ;
                 int weight = Integer.parseInt(trimmedArray[2]);
                 getGraph()[v1][v2] = weight;
             }
@@ -116,8 +116,8 @@ public class MatrixGraph implements Graph {
     public void clearVertex(int vertexID){
         for(int i = 0; i < getGraph().length; i++)
         {
-            getGraph()[i][vertexID-1] = 0;
-            getGraph()[vertexID-1][i] = 0;
+            getGraph()[i][vertexID] = 0;
+            getGraph()[vertexID][i] = 0;
         }
         // todo : change indexing to 1?
     }
@@ -144,15 +144,15 @@ public class MatrixGraph implements Graph {
         Vertex[] result = new Vertex[0];
         for (int i = 0; i < graphSize; i++)
         {
-            if(getGraph()[vertexID-1][i] != 0)
+            if(getGraph()[vertexID][i] != 0)
             {
                 result = expandArray(result, result.length+1, result.length);
-                result[result.length-1] = new Vertex(i+1, -1);
+                result[result.length-1] = new Vertex(i, -1);
             }
-            if(getGraph()[i][vertexID-1] != 0)
+            if(getGraph()[i][vertexID] != 0)
             {
                 result = expandArray(result, result.length+1, result.length);
-                result[result.length-1] = new Vertex(i+1, -1);
+                result[result.length-1] = new Vertex(i, -1);
             }
             //TODO remove duplicates
             result = removeDuplicates(result);
@@ -195,18 +195,18 @@ public class MatrixGraph implements Graph {
         Edge[] incident = new Edge[0];
         for(int i = 0; i < getGraph().length; i++)
         {
-                if(getGraph()[vertexID-1][i] !=0)
+                if(getGraph()[vertexID][i] !=0)
                 {
                     // System.out.print("i = " + i);
 
                     incident =  GraphUtils.expandArray(incident, incident.length + 1, incident.length);
-                    Edge tmp = new Edge(vertexID, new Vertex(i+1, getGraph()[vertexID-1][i]), getGraph()[vertexID-1][i]);
+                    Edge tmp = new Edge(vertexID, new Vertex(i, getGraph()[vertexID][i]), getGraph()[vertexID][i]);
                     incident[incident.length-1] = tmp;
                 }
-                if(getGraph()[i][vertexID-1] != 0)
+                if(getGraph()[i][vertexID] != 0)
                 {
                     incident =  GraphUtils.expandArray(incident, incident.length + 1, incident.length);
-                    Edge tmp = new Edge(i+1, new Vertex(vertexID, getGraph()[i][vertexID-1]), getGraph()[i][vertexID-1]);
+                    Edge tmp = new Edge(i, new Vertex(vertexID, getGraph()[i][vertexID]), getGraph()[i][vertexID]);
                     incident[incident.length-1] = tmp;
                  }
         }

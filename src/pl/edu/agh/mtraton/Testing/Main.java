@@ -32,7 +32,8 @@ public class Main {
         FordFulkerson ford = new FordFulkerson();
         //ford
        // System.out.print(ford.findDFSPath(1,4));
-        ford.foobar(1,2);
+        ford.foobar(3,9);
+        ford.foobar(9,3);
 
 
        // MatrixGraph MatGraph = new MatrixGraph("C:\\graf.txt");

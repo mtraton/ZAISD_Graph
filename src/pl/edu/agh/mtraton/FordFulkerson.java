@@ -1,10 +1,11 @@
 package pl.edu.agh.mtraton;
 
 import pl.edu.agh.mtraton.Utils.*;
-import pl.edu.agh.mtraton.Utils.Queue;
+//import pl.edu.agh.mtraton.Utils.Queue;
 import pl.edu.agh.mtraton.Utils.Stack;
 
 import java.util.*;
+import java.util.Queue;
 
 
 /**
@@ -90,25 +91,24 @@ public class FordFulkerson {
 
     public void foobar(int sVertex, int tVertex )
     {
-        graph.printWholeGraph();
+
         // variables
-        pl.edu.agh.mtraton.Utils.Queue q = new Queue(1000); // todo: dynamic queue
+        java.util.Queue <Integer> q = new LinkedList<Integer>(); // todo: dynamic queue
         int [][] capacities;
         int [][] flows;
-        int [] prevoius; // previous nodes for BFS
+        int [] previous; // previous nodes for BFS
         int [] cfp; // capacity of path
-        int nVertices ;
-        int mEdges;
+        int nVertices;
         int fmax, cp, x,i;
         boolean escape; // to break nested loops
 
         nVertices = graph.getNumberOfVertices();
-        mEdges = graph.getNumberOfEdges();
 
-        capacities = new int[nVertices][nVertices];
+
+        //capacities = new int[nVertices][nVertices];
         flows = new int[nVertices][nVertices];
 
-        prevoius = new int [nVertices];
+        previous = new int [nVertices];
         cfp = new int [nVertices];
 
         capacities = graph.getGraph();
@@ -117,32 +117,32 @@ public class FordFulkerson {
 
         while(true)
         {
-            for(i = 0; i < nVertices; i++) prevoius[i] = -1; // initialize previouses :D
-            prevoius[sVertex] = -2; // starting vertex does not have previous vertex
+            for(i = 0; i < nVertices; i++) previous[i] = -1; // initialize previouses :D
+            previous[sVertex] = -2; // starting vertex does not have previous vertex
             cfp[sVertex] = Integer.MAX_VALUE;  // todo: is this assignment valid?
 
-            /*
+
             while(!q.isEmpty())
             {
-                q.pop(); // todo: is it valid ?
+                q.remove(); // todo: is it valid ?
             }
-            */
-            q = new Queue(1000);
+
+           // q = new Queue(1000);
 
 
-            q.push(sVertex);
+            q.add(sVertex);
             escape = false;
 
             while (!q.isEmpty()) //BFS path search
             {
-                x = q.pop(); // todo
+                x = q.remove(); // todo
                 for (int y = 0; y <nVertices; y++)
                 {
                     cp = capacities[x][y] - flows[x][y]; // calculate residual capacity for edge x->y
 
-                    if( (cp != 0) && (prevoius[y] == -1)) // edge does not exist and vertex y was already visited
+                    if( (cp != 0) && (previous[y] == -1)) // edge does not exist and vertex y was already visited
                     {
-                        prevoius[y] = x;
+                        previous[y] = x;
 
                         // calculate residual path capacity for y - smaller between cfp to previous or current cfp from x -> y
 
@@ -161,9 +161,9 @@ public class FordFulkerson {
 
                             // backtracking and changing values of flows
                             i = y;
-                            while(i != sVertex)
+                            while(i != sVertex) //
                             {
-                                x = prevoius[i];
+                                x = previous[i];
                                 flows[x][i] += cfp[tVertex];
                                 flows[i][x] -= cfp[tVertex];
                                 i = x;
@@ -174,7 +174,7 @@ public class FordFulkerson {
                             break;
                         }
 
-                        q.push(y); // q is not t vertex -> new loop iteration
+                        q.add(y); // q is not t vertex -> new loop iteration
                     }
                 }
 
