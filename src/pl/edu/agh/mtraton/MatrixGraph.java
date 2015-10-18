@@ -6,18 +6,18 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.regex.Pattern;
+
 /**
  * Created by Rael on 2015-10-08.
  */
 public class MatrixGraph implements Graph {
     // POLA
-    int [][] graph;
+    private int [][] graph;
     int graphSize;
     public MatrixGraph(String Path)
     {
         graphSize = loadNumberOfIndices(Path);
-        graph = new int[graphSize][graphSize];
+        setGraph(new int[graphSize][graphSize]);
         loadGraphFromFile(Path);
     }
 
@@ -78,7 +78,7 @@ public class MatrixGraph implements Graph {
                 int v1 = Integer.parseInt(trimmedArray[0]) -1; // array index starts with 0, graph index starts with 1!
                 int v2 = Integer.parseInt(trimmedArray[1]) -1;
                 int weight = Integer.parseInt(trimmedArray[2]);
-                graph[v1][v2] = weight;
+                getGraph()[v1][v2] = weight;
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -99,10 +99,10 @@ public class MatrixGraph implements Graph {
     public void addVertex(int vertexID)
     {
         // check if vertex already exists
-        if(vertexID >= graph.length)
+        if(vertexID >= getGraph().length)
         {
             // expand matrix
-            graph = expandMatrix(graph, vertexID, graph.length);
+            setGraph(expandMatrix(getGraph(), vertexID, getGraph().length));
         }
         else{
             System.out.println("Either incorrect or already existing vertex index given!");
@@ -114,10 +114,10 @@ public class MatrixGraph implements Graph {
     }
 
     public void clearVertex(int vertexID){
-        for(int i = 0; i < graph.length; i++)
+        for(int i = 0; i < getGraph().length; i++)
         {
-            graph[i][vertexID-1] = 0;
-            graph[vertexID-1][i] = 0;
+            getGraph()[i][vertexID-1] = 0;
+            getGraph()[vertexID-1][i] = 0;
         }
         // todo : change indexing to 1?
     }
@@ -125,12 +125,12 @@ public class MatrixGraph implements Graph {
     public void addEdge(int v1, int v2, int weight)
     {
         // check if out of bonds?
-        graph[v1][v2] = weight;
+        getGraph()[v1][v2] = weight;
     }
 
     public void removeEdge(int v1, int v2)
     {
-        graph[v1][v2] = 0;
+        getGraph()[v1][v2] = 0;
     }
 
     public Vertex [] expandArray (Vertex [] oldArray, int newSize, int oldSize)
@@ -144,12 +144,12 @@ public class MatrixGraph implements Graph {
         Vertex[] result = new Vertex[0];
         for (int i = 0; i < graphSize; i++)
         {
-            if(graph[vertexID-1][i] != 0)
+            if(getGraph()[vertexID-1][i] != 0)
             {
                 result = expandArray(result, result.length+1, result.length);
                 result[result.length-1] = new Vertex(i+1, -1);
             }
-            if(graph[i][vertexID-1] != 0)
+            if(getGraph()[i][vertexID-1] != 0)
             {
                 result = expandArray(result, result.length+1, result.length);
                 result[result.length-1] = new Vertex(i+1, -1);
@@ -193,32 +193,32 @@ public class MatrixGraph implements Graph {
     {
         // Outcoming edges
         Edge[] incident = new Edge[0];
-        for(int i = 0; i < graph.length; i++)
+        for(int i = 0; i < getGraph().length; i++)
         {
-                if(graph[vertexID-1][i] !=0)
+                if(getGraph()[vertexID-1][i] !=0)
                 {
                     // System.out.print("i = " + i);
 
                     incident =  GraphUtils.expandArray(incident, incident.length + 1, incident.length);
-                    Edge tmp = new Edge(vertexID, new Vertex(i+1,graph[vertexID-1][i]), graph[vertexID-1][i]);
+                    Edge tmp = new Edge(vertexID, new Vertex(i+1, getGraph()[vertexID-1][i]), getGraph()[vertexID-1][i]);
                     incident[incident.length-1] = tmp;
                 }
-                if(graph[i][vertexID-1] != 0)
+                if(getGraph()[i][vertexID-1] != 0)
                 {
                     incident =  GraphUtils.expandArray(incident, incident.length + 1, incident.length);
-                    Edge tmp = new Edge(i+1, new Vertex(vertexID,graph[i][vertexID-1]), graph[i][vertexID-1]);
+                    Edge tmp = new Edge(i+1, new Vertex(vertexID, getGraph()[i][vertexID-1]), getGraph()[i][vertexID-1]);
                     incident[incident.length-1] = tmp;
                  }
         }
         return incident;
     }
     public int getNumberOfVertices(){
-        return graph.length;
+        return getGraph().length;
     }
     public int getNumberOfEdges()
     {
         int sum = 0;
-        for(int[] i : graph)
+        for(int[] i : getGraph())
         {
             for(int j: i)
             {
@@ -229,24 +229,24 @@ public class MatrixGraph implements Graph {
     }
     public boolean areNeighbours(int v1, int v2)
     {
-        if(graph[v1][v2] != 0) return true;
+        if(getGraph()[v1][v2] != 0) return true;
         else return false;
     }
 
     public void printGraph()
     {
-       for (int i = 0; i < graph.length; i++)
+       for (int i = 0; i < getGraph().length; i++)
        {
-           for(int j = 0; j < graph.length; j++)
+           for(int j = 0; j < getGraph().length; j++)
            {
-               System.out.println("[" + i + "]" + "[" + j + "] = " + graph[i][j]);
+               System.out.println("[" + i + "]" + "[" + j + "] = " + getGraph()[i][j]);
            }
        }
     }
     // TODO: pozamieniaæ nazwy, sprawdziæ!
     public int[][] expandMatrix(int [][] oldArray, int newSize, int oldSize)
     {
-        int indicesCount = graph.length;
+        int indicesCount = getGraph().length;
         int [][] expandedMatrix = new int [newSize][newSize];
         for(int i = 0; i < indicesCount; i++)
         {
@@ -278,20 +278,27 @@ public class MatrixGraph implements Graph {
 
     public void printWholeGraph()
     {
-        for (int i = 0; i < graph.length; i++)
+        for (int i = 0; i < getGraph().length; i++)
         {
             System.out.println();
-            for(int j = 0; j < graph.length; j++)
+            for(int j = 0; j < getGraph().length; j++)
             {
-                String str = Integer.toString(graph[i][j]);
+                String str = Integer.toString(getGraph()[i][j]);
                 //String result = String.format("%03d", str);
 
 
                // result = result + ",";
-                System.out.printf("%-3d", graph[i][j]);
+                System.out.printf("%-3d", getGraph()[i][j]);
                 System.out.print(",");
             }
         }
     }
 
+    public int[][] getGraph() {
+        return graph;
+    }
+
+    public void setGraph(int[][] graph) {
+        this.graph = graph;
+    }
 };

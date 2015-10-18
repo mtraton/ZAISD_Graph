@@ -202,7 +202,6 @@ public class AdjencyListGraph implements  Graph {
         for(int i = 1; i < graph[v1ID].length; i++) // TODO : deal with empty [0] elements
         {
             Vertex tmp = graph[v1ID][i];
-            System.out.println(tmp);
             if(tmp.getVid() == v2ID) //  check out if given edge already exists
             {
                 return;
@@ -231,7 +230,7 @@ public class AdjencyListGraph implements  Graph {
     public Vertex[] removeElementFromArray(Vertex[] arr, int id)
     {
         Vertex [] newArr = new Vertex[arr.length-1];
-        printArray(arr);
+        //printArray(arr);
 
         for(int i=0, j =0; (i < arr.length) && (j < newArr.length); i++, j++)
         {
@@ -263,9 +262,7 @@ public class AdjencyListGraph implements  Graph {
                 }
             }
         }
-        printArray(Neighbours);
         Neighbours = removeDuplicates(Neighbours);
-        printArray(Neighbours);
         return Neighbours; //TODO:
     }
 

@@ -19,19 +19,27 @@ Zaimplementowaæ powy¿szy interfejs za pomoc¹ reprezentacji macierzowej i listy s
  */
 
 
-import pl.edu.agh.mtraton.AdjencyListGraph;
-import pl.edu.agh.mtraton.Edge;
-import pl.edu.agh.mtraton.MatrixGraph;
-import pl.edu.agh.mtraton.Vertex;
+import pl.edu.agh.mtraton.*;
 
 public class Main {
 
     public static void main(String[] args) {
 	// write your code here
-        MatrixGraph MatGraph = new MatrixGraph("C:\\graf.txt");
+
+        //AdjencyListGraph graph = new AdjencyListGraph("D:\\d.txt");
+        //graph.printGraph();
+        //System.out.println(graph.getNumberOfVertices());
+        FordFulkerson ford = new FordFulkerson();
+        //ford
+       // System.out.print(ford.findDFSPath(1,4));
+        ford.foobar(1,2);
+
+
+       // MatrixGraph MatGraph = new MatrixGraph("C:\\graf.txt");
 
         //MatGraph.addVertex(25);
         //MatGraph.clearVertex(5);
+/*
         MatGraph.printWholeGraph();
         Vertex [] arr = MatGraph.returnNeighbourVertices(1);
         AdjencyListGraph adj = new AdjencyListGraph("C:\\graf.txt");
@@ -43,7 +51,7 @@ public class Main {
         adj.printArray(incident);
         System.out.println("Vertices: " + MatGraph.getNumberOfVertices());
         System.out.println("Vertices: " + MatGraph.getNumberOfEdges());
-
+*/
         //AdjencyListGraph AdjGraph = new AdjencyListGraph("C:\\graf.txt");
         //AdjGraph.addVertex(21);
         //AdjGraph.printGraph();
