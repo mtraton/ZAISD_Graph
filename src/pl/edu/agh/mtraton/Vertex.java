@@ -10,7 +10,8 @@ public class Vertex <X> {
 
     private static int next_id = 0; // TODO : does it make sense?
     private int vid;
-    private X value;
+    private X value; // capacity
+    private int f;
 
     public Vertex()
     {
@@ -21,11 +22,21 @@ public class Vertex <X> {
     {
         vid = next_id++;
         value = val;
+        f = 0;
     }
     public Vertex(int id, X val)
     {
         vid = id;
         value = val;
+        f = 0;
+
+    }
+    public Vertex(int id, X val, int fval)
+    {
+        vid = id;
+        value = val;
+        f = fval;
+
     }
 
     public int getVid() {
@@ -49,5 +60,13 @@ public class Vertex <X> {
         String s = "";
         s = s + "vid: " + vid + ", val:" + value;
         return s;
+    }
+
+    public int getF() {
+        return f;
+    }
+
+    public void setF(int f) {
+        this.f = f;
     }
 }

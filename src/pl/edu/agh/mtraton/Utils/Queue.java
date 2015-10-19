@@ -31,7 +31,7 @@ public class Queue {
             queue[i] = queue[i+1];
 
         queue[counter] = 0;
-
+        counter--;
         return res;
     }
     public boolean isEmpty()

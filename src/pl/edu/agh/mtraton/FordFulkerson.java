@@ -1,25 +1,25 @@
 package pl.edu.agh.mtraton;
 
 import pl.edu.agh.mtraton.Utils.*;
-//import pl.edu.agh.mtraton.Utils.Queue;
+import pl.edu.agh.mtraton.Utils.Queue;
 import pl.edu.agh.mtraton.Utils.Stack;
 
 import java.util.*;
-import java.util.Queue;
+//import java.util.Queue;
 
 
 /**
  * Created by Rael on 18.10.2015.
  */
 public class FordFulkerson {
-   // AdjencyListGraph graph = new AdjencyListGraph("C:\\graf.txt");
-    MatrixGraph graph = new MatrixGraph("C:\\graf.txt");
+    AdjencyListGraph lgraph = new AdjencyListGraph("D:\\d.txt");
+    MatrixGraph graph = new MatrixGraph("D:\\d.txt");
     int fordFulkerson(int startVertex, int EndVertex)
     {
 
         // create residual network
         AdjencyListGraph residual = new AdjencyListGraph("D:\\duzy_graf.txt");
-        // f(u,v) \leftarrow 0 for all edges (u,v) (przep³yw)
+        // f(u,v) \leftarrow 0 for all edges (u,v) (przepï¿½yw)
         for(int i = 0; i < residual.graph.length; i++)
         {
             for(int j = 0; j < residual.graph[i].length; j++)
@@ -89,11 +89,11 @@ public class FordFulkerson {
     }
 
 
-    public void foobar(int sVertex, int tVertex )
+    public void ffMatrix(int sVertex, int tVertex )
     {
 
         // variables
-        java.util.Queue <Integer> q = new LinkedList<Integer>(); // todo: dynamic queue
+        Queue  q = new Queue(1000); // todo: dynamic queue
         int [][] capacities;
         int [][] flows;
         int [] previous; // previous nodes for BFS
@@ -103,7 +103,7 @@ public class FordFulkerson {
         boolean escape; // to break nested loops
 
         nVertices = graph.getNumberOfVertices();
-
+        //System.out.println("Vertices: " + nVertices);
 
         //capacities = new int[nVertices][nVertices];
         flows = new int[nVertices][nVertices];
@@ -183,7 +183,9 @@ public class FordFulkerson {
             }
             if(!escape) break;
         }
-        System.out.println("fmax = " + fmax);
+        System.out.println("Matrix fmax = " + fmax);
+        /*
+
         for( x = 0; x < nVertices; x++)
         {
             for(int y =0; y < nVertices; y++)
@@ -191,6 +193,136 @@ public class FordFulkerson {
                 if(capacities[x][y] != 0) System.out.print(x + " -> " + y + " " + flows[x][y]  + " : " + capacities[x][y]);
             }
         }
+        */
+
+    }
+    public void ffList(int sVertex, int tVertex)
+    {
+        int nVertices = lgraph.getNumberOfVertices();
+        int  fmax, i, cp, u, v;
+
+        Queue q = new Queue(1000);
+        int[] previous = new int[nVertices];
+        int[] cfp = new int[nVertices];
+        boolean test = false;
+        //Vertex x,z;
+        //todo : is graph structure valid -> flows?
+        fmax = 0;
+
+        for(u = 0; u < nVertices; u++)
+        {
+            // iterate through neighbours of u'th node
+            Vertex[] neighbors = lgraph.getOutcomingVertices(u);
+            for(int counter = 0; counter < neighbors.length; counter++)
+            {
+                Vertex x = neighbors[counter];
+                test = false;
+                Vertex [] zlist = lgraph.getOutcomingVertices(x.getVid());
+                for(int z  = 0; z < zlist.length; z++)
+                {
+                    if(zlist[z].getVid() == u)
+                    {
+                        test = true;
+                        break;
+                    }
+                }
+                if(test) continue;
+
+                // add new edge
+                /*
+                Vertex z = new Vertex();
+                zlist[0].setVid(u);
+                zlist[0].setValue(0);
+                zlist[0].setF(0);
+                lgraph.addEdge(u,neighbors[x.getVid()].getVid(), 0, 0);// todo
+                neighbors[x.getVid()] = z;
+                */
+
+
+
+            }
+        }
+        while(true)
+        {
+            for(i = 0; i < nVertices; i++)
+            {
+                previous[i] = -1;
+            }
+            cfp[sVertex] = Integer.MAX_VALUE;
+
+            while(!q.isEmpty()) q.remove();
+
+            q.add(sVertex);
+
+            while(!q.isEmpty())
+            {
+                test = false;
+                u = q.remove();
+
+                Vertex [] neighbours = lgraph.getOutcomingVertices(u);
+                for(i = 0; i < neighbours.length; i++)
+                {
+                    Vertex x = neighbours[i];
+                    cp = ((int)x.getValue()) - x.getF();
+
+                    if(cp != 0 && (previous[x.getVid()] == -1) )
+                    {
+                        previous[x.getVid()] = u;
+                        if(cp < cfp[u])
+                        {
+                            cfp[x.getVid()] = cp;
+                        }
+                        else
+                        {
+                            cfp[x.getVid()] = cfp[u];
+                        }
+
+                        if(x.getVid() == tVertex)
+                        {
+                            test = true;
+                            break;
+                        }
+                        else
+                        {
+                            q.add(x.getVid());
+                        }
+
+                    }
+                }
+                if(test) break;
+
+            }
+            if(!test) break;
+
+            fmax += cfp[tVertex];
+            for( v = tVertex; v != sVertex; v = u)
+            {
+                u = previous[v];
+                Vertex[] neighbors = lgraph.getOutcomingVertices(u);
+                for(int z = 0; z < neighbors.length; z++)
+                {
+
+                    if(neighbors[z].getVid() == v)//todo
+                    {
+                        neighbors[z].setF(neighbors[z].getF() + cfp[tVertex]);
+                        break;
+                    }
+                }
+
+                neighbors = lgraph.getOutcomingVertices(v);
+                for(int z = 0; z < neighbors.length; z++)
+                {
+
+                    if(neighbors[z].getVid() == u)//todo
+                    {
+                        neighbors[z].setF(neighbors[z].getF() - cfp[tVertex]);
+                        break;
+                    }
+                }
+
+            }
+        }
+        System.out.println("List fmax : " + fmax);
 
     }
 }

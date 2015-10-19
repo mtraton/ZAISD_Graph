@@ -32,12 +32,13 @@ public class Main {
         FordFulkerson ford = new FordFulkerson();
         //ford
        // System.out.print(ford.findDFSPath(1,4));
-        ford.foobar(3,9);
-        ford.foobar(9,3);
-
-
+        long start = System.currentTimeMillis();
+        ford.ffMatrix(109, 609);
+        System.out.println("\n TIME [ms]: " + (System.currentTimeMillis() - start));
        // MatrixGraph MatGraph = new MatrixGraph("C:\\graf.txt");
-
+        start = System.currentTimeMillis();
+        ford.ffList(109,609);
+        System.out.println("\n TIME [ms]: " + (System.currentTimeMillis() - start));
         //MatGraph.addVertex(25);
         //MatGraph.clearVertex(5);
 /*

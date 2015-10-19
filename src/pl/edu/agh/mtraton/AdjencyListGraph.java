@@ -22,7 +22,7 @@ public class AdjencyListGraph implements  Graph {
     public AdjencyListGraph (String path)
     {
         indicesCount = loadNumberOfIndices(path);
-        graph = new Vertex [indicesCount +1][0] ; // assumption - we can have indice with id that equals 0
+        graph = new Vertex [indicesCount + 2][0] ; // assumption - we can have indice with id that equals 0
         loadGraphFromFile(path);
     }
 
@@ -210,6 +210,22 @@ public class AdjencyListGraph implements  Graph {
         graph[v1ID] = expandArray(graph[v1ID], graph[v1ID].length + 1, graph[v1ID].length);
         graph[v1ID][graph[v1ID].length-1] = new Vertex(v2ID, weight);
     }
+    public void addEdge(int v1ID, int v2ID, int capacity, int flow)
+    {
+        System.out.print("!!!" + graph[v1ID].length);
+
+        for(int i = 1; i < graph[v1ID].length; i++) // TODO : deal with empty [0] elements
+        {
+            Vertex tmp = graph[v1ID][i];
+            if(tmp.getVid() == v2ID) //  check out if given edge already exists
+            {
+                return;
+            }
+        }
+        graph[v1ID] = expandArray(graph[v1ID], graph[v1ID].length + 1, graph[v1ID].length);
+        graph[v1ID][graph[v1ID].length-1] = new Vertex(v2ID, capacity, flow);
+    }
+
 
     public void removeEdge(int v1ID, int v2ID)
     {
@@ -242,6 +258,12 @@ public class AdjencyListGraph implements  Graph {
             newArr[j] = arr[i];
         }
         return newArr;
+    }
+
+    public Vertex[] getOutcomingVertices(int vertexID)
+    {
+        //todo: protect from access
+        return graph[vertexID];
     }
 
     public Vertex[] returnNeighbourVertices(int vertexID)
