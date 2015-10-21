@@ -186,7 +186,12 @@ public class MatrixGraph implements Graph {
 
 
 
+    public Edge[] getEdges()
+    {
+        Edge[] edges = new Edge[getNumberOfEdges()];
 
+        return edges;
+    }
 
 
     public Edge[] returnIncidentEdges(int vertexID)

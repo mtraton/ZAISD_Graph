@@ -26,19 +26,36 @@ public class Main {
     public static void main(String[] args) {
 	// write your code here
 
+
         //AdjencyListGraph graph = new AdjencyListGraph("D:\\d.txt");
         //graph.printGraph();
         //System.out.println(graph.getNumberOfVertices());
-        FordFulkerson ford = new FordFulkerson();
+       // FordFulkerson ford = new FordFulkerson();
         //ford
        // System.out.print(ford.findDFSPath(1,4));
-        long start = System.currentTimeMillis();
-        ford.ffMatrix(109, 609);
-        System.out.println("\n TIME [ms]: " + (System.currentTimeMillis() - start));
-       // MatrixGraph MatGraph = new MatrixGraph("C:\\graf.txt");
-        start = System.currentTimeMillis();
-        ford.ffList(109,609);
-        System.out.println("\n TIME [ms]: " + (System.currentTimeMillis() - start));
+        //long start = System.currentTimeMillis();
+       // ford.ffMatrix(109, 609);
+       // System.out.println("\n TIME [ms]: " + (System.currentTimeMillis() - start));S
+       String path = new String("D:\\d.txt");
+       MatrixGraph MatGraph = new MatrixGraph(path);
+       AdjencyListGraph ListGraph = new AdjencyListGraph(path);
+       BellmanFord bf = new BellmanFord();
+       int [] lengths =  bf.bellmanFord(109, MatGraph);
+       for(int i = 0; i < lengths.length; i++)
+       {
+           System.out.println("Shortest path to " + i + " = " + lengths[i]);
+       }
+        bf.printPath(609);
+        /*
+        lengths =  bf.bellmanFord(1, ListGraph);
+        for(int i = 0; i < lengths.length; i++)
+        {
+            System.out.println("Shortest path to " + i + " = " + lengths[i]);
+        }
+        */
+       //start = System.currentTimeMillis();
+       // ford.ffList(109,609);
+       // System.out.println("\n TIME [ms]: " + (System.currentTimeMillis() - start));
         //MatGraph.addVertex(25);
         //MatGraph.clearVertex(5);
 /*

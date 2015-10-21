@@ -183,7 +183,7 @@ public class FordFulkerson {
             }
             if(!escape) break;
         }
-        System.out.println("Matrix fmax = " + fmax);
+        System.out.println("Matrix implementation:  fmax from " + sVertex + " to " + tVertex + " = " + fmax);
         /*
 
         for( x = 0; x < nVertices; x++)
@@ -322,7 +322,7 @@ public class FordFulkerson {
 
             }
         }
-        System.out.println("List fmax : " + fmax);
+        System.out.println("List implementation:  fmax from " + sVertex + " to " + tVertex + " = " + fmax);
 
     }
 }
